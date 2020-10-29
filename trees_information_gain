@@ -51,6 +51,8 @@ def calcShannonEnt(dataSet):#计算香农熵
 
 #定义按照某个特征进行划分的函数splitDataSet
 #输入三个变量（待划分的数据集，特征，分类值）
+#axis特征值中0代表no surfacing，1代表flippers
+#value分类值中0代表否，1代表是
 def splitDataSet(dataSet,axis,value):
     retDataSet = []
     for featVec in dataSet:#取大列表中的每个小列表
@@ -64,7 +66,7 @@ def splitDataSet(dataSet,axis,value):
 def chooseBestFeatureToSplit(dataSet):
     numFeature = len(dataSet[0]) - 1
     baseEntropy = calcShannonEnt(dataSet)
-    bestGainRatio = 0
+    bestInforGain = 0
     bestFeature = -1
 
     for i in range(numFeature):
@@ -73,16 +75,14 @@ def chooseBestFeatureToSplit(dataSet):
 
         #计算每个属性i的概论熵
         newEntropy = 0
-        interinsicValue = 0
         for value in uniquelVals:
             subDataSet = splitDataSet(dataSet,i,value)#得到i属性下取i属性为value时的集合
             prob = len(subDataSet)/float(len(dataSet))#每个属性取值为value时所占比重
-            interinsicValue -= prob*log2(prob)
             newEntropy+= prob*calcShannonEnt(subDataSet)
-        gainRatio = (baseEntropy - newEntropy) / interinsicValue #当前属性i的增益比率
+        inforGain = baseEntropy - newEntropy #当前属性i的信息增益
 
-        if gainRatio > bestGainRatio:
-            bestGainRatio = gainRatio
+        if inforGain>bestInforGain:
+            bestInforGain = inforGain
             bestFeature = i
 
     return bestFeature#返回最大信息增益属性下标
